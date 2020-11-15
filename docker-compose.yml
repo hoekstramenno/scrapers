@@ -3,8 +3,8 @@ services:
   php:
     build: ./docker/php
     ports: ['9000:9000']
-    volumes: ['./symfony/:/var/www/symfony:cached']
+    volumes: ['./:/var/www/symfony:cached']
   nginx:
     build: ./docker/nginx
-    ports: ['8080:80']
-    volumes: ['./symfony/:/var/www/symfony:cached']
+    ports: ['8000:80']
+    volumes: ['./:/var/www/symfony:cached']
