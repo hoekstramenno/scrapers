@@ -2,12 +2,14 @@ version: '3.7'
 
 services:
   php:
-    container_name: scraper-php
     build: ./docker/php
     ports: ['9000:9000']
     volumes: ['./:/var/www/symfony:cached']
   nginx:
-    container_name: scraper-nginx
     build: ./docker/nginx
     ports: ['8000:80']
     volumes: ['./:/var/www/symfony:cached']
+
+networks:
+  default:
+    name: scrapers-network

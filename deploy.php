@@ -2,44 +2,36 @@
 
 namespace Deployer;
 
-require 'recipe/common.php';
+require 'recipe/symfony4.php';
 
-desc('Deploy project');
-task('deploy', [
-    'deploy:info',
-    'deploy:prepare',
-    'deploy:lock',
-    'deploy:release',
-    'deploy:update_code',
-    'deploy:shared',
-    'deploy:docker',
-    'deploy:vendors',
-    'deploy:writable',
-//    'deploy:cache:clear',
-//    'deploy:cache:warmup',
-    'deploy:symlink',
-    'deploy:unlock',
-    'cleanup',
-]);
+set('bin/console', function () {
+    return parse('bin/console');
+});
+
+set('docker/exec', function () {
+    return parse('docker-compose exec php');
+});
+
+set('bin/php', function () {
+    return parse('{{docker/exec}} php');
+});
+
+set('bin/composer', function () {
+    return parse('{{docker/exec}} composer');
+});
+
+desc('Installing vendors');
+task('deploy:vendors', function () {
+    if (!commandExist('unzip')) {
+        writeln('<comment>To speed up composer installation setup "unzip" command with PHP zip extension https://goo.gl/sxzFcD</comment>');
+    }
+    run('cd {{release_path}} && {{bin/composer}} {{composer_options}}');
+});
 
 task('deploy:docker', function () {
-    run('cd {{release_path}} && docker-compose build');
-    run('cd {{release_path}} && docker-compose up --no-deps -d');
+    run('cd {{release_path}} && docker-compose up -d --build');
 });
-
-task('deploy:vendors', function () {
-    run('docker-compose exec php composer {{composer_options}}');
-});
-
-desc('Clear cache');
-task('deploy:cache:clear', function () {
-    run('docker-compose exec php {{bin/console}} cache:clear {{console_options}} --no-warmup');
-});
-
-desc('Warm up cache');
-task('deploy:cache:warmup', function () {
-    run('docker-compose exec php {{bin/console}} cache:warmup {{console_options}}');
-});
+after('deploy:shared', 'deploy:docker');
 
 // Project name
 set('application', 'scrapers');
