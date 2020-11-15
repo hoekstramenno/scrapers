@@ -13,6 +13,7 @@ task('deploy', [
     'deploy:update_code',
     'deploy:shared',
     'deploy:build_docker',
+    'deploy:docker_up',
     'deploy:vendors',
     'deploy:writable',
 //    'deploy:cache:clear',
@@ -26,8 +27,12 @@ task('deploy:build_docker', function () {
     run('cd {{release_path}} && docker-compose build');
 });
 
+task('deploy:docker_up', function () {
+    run('cd {{release_path}} && docker-compose up --no-deps -d');
+});
+
 task('deploy:vendors', function () {
-    run('docker-compose exec php {{bin/composer}} {{composer_options}}');
+    run('docker-compose exec php "composer {{composer_options}}"');
 });
 
 
