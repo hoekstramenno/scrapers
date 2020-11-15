@@ -12,8 +12,7 @@ task('deploy', [
     'deploy:release',
     'deploy:update_code',
     'deploy:shared',
-    'deploy:build_docker',
-    'deploy:docker_up',
+    'deploy:docker',
     'deploy:vendors',
     'deploy:writable',
 //    'deploy:cache:clear',
@@ -23,19 +22,24 @@ task('deploy', [
     'cleanup',
 ]);
 
-task('deploy:build_docker', function () {
+task('deploy:docker', function () {
     run('cd {{release_path}} && docker-compose build');
-});
-
-task('deploy:docker_up', function () {
     run('cd {{release_path}} && docker-compose up --no-deps -d');
 });
 
 task('deploy:vendors', function () {
-    run('docker-compose exec php "composer {{composer_options}}"');
+    run('docker-compose exec php composer {{composer_options}}');
 });
 
+desc('Clear cache');
+task('deploy:cache:clear', function () {
+    run('docker-compose exec php {{bin/console}} cache:clear {{console_options}} --no-warmup');
+});
 
+desc('Warm up cache');
+task('deploy:cache:warmup', function () {
+    run('docker-compose exec php {{bin/console}} cache:warmup {{console_options}}');
+});
 
 // Project name
 set('application', 'scrapers');

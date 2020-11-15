@@ -7,7 +7,7 @@ services:
     ports: ['9000:9000']
     volumes: ['./:/var/www/symfony:cached']
   nginx:
-    container_name: nginx-php
+    container_name: scraper-nginx
     build: ./docker/nginx
     ports: ['8000:80']
     volumes: ['./:/var/www/symfony:cached']
